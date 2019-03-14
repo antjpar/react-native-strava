@@ -1,5 +1,5 @@
 
-package com.valerit;
+package com.valerit.rnstrava;
 
 import java.util.Arrays;
 import java.util.Collections;

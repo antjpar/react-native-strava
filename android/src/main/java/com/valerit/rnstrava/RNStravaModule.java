@@ -1,5 +1,5 @@
 
-package com.valerit;
+package com.valerit.rnstrava;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
