@@ -19,4 +19,9 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
   public String getName() {
     return "RNReactNativeStrava";
   }
+
+  @ReactMethod
+  public void login(String client_id, String redirect_uri, String response_type, String approval_prompt, String scope) {
+
+  }
 }
