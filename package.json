@@ -1,0 +1,23 @@
+
+{
+  "name": "react-native-strava",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native",
+    "strava"
+  ],
+  "author": "Valeri Tsertsvadze",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/valerit/react-native-strava.git"
+  },
+  "license": "",
+  "peerDependencies": {
+    "react-native": "^0.41.2"
+  }
+}
