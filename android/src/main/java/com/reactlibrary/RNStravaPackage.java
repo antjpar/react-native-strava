@@ -10,10 +10,10 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import com.facebook.react.bridge.JavaScriptModule;
-public class RNReactNativeStravaPackage implements ReactPackage {
+public class RNStravaPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-      return Arrays.<NativeModule>asList(new RNReactNativeStravaModule(reactContext));
+      return Arrays.<NativeModule>asList(new RNStravaModule(reactContext));
     }
 
     // Deprecated from RN 0.47
