@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.author             = { "author" => "valeritsert@gmail.com" }
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/valerit/react-native-strava.git", :tag => "master" }
-  s.source_files  = "RNReactNativeStrava/**/*.{h,m}"
+  s.source_files  = "*.{h,m}"
   s.requires_arc = true
 
 
