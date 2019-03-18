@@ -29,10 +29,19 @@ RCT_EXPORT_METHOD(login:(NSString*)client_id
     [UIApplication.sharedApplication openURL:appOAuthUrl];
   } else {
     if (@available(iOS 12.0, *)) {
-      ASWebAuthenticationSession *authSession = [ASWebAuthenticationSession initWithURL: webOAuthUrl, @"noblepro://", ];
+      ASWebAuthenticationSession *authSession = [[ASWebAuthenticationSession alloc] initWithURL: webOAuthUrl callbackURLScheme:@"noblepro://" completionHandler:^(NSURL * _Nullable callbackURL, NSError * _Nullable error) {
+        
+      }];
+      [authSession start];
     } else {
-      // Fallback on earlier versions
-      SFAuthenticationSession *authSession
+      if (@available(iOS 11.0, *)) {
+        SFAuthenticationSession *authSession = [[SFAuthenticationSession alloc] initWithURL:webOAuthUrl callbackURLScheme:@"noblepro://" completionHandler:^(NSURL * _Nullable callbackURL, NSError * _Nullable error) {
+          
+        }];
+        [authSession start];
+      } else {
+        // Fallback on earlier versions
+      }
     }
   }
 
