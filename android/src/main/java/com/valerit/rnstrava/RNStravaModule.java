@@ -5,13 +5,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 
+import com.facebook.react.bridge.ReadableMap;
 import com.garmin.fit.*;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class RNStravaModule extends ReactContextBaseJavaModule {
 
@@ -58,7 +63,87 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void generateFitFile() {
+    public void generateFitFile(ReadableMap session, Promise promise) {
+        // Required Parameters, unit
+        FileEncoder encode;
+        String fileName = UUID.randomUUID().toString();
+        java.io.File file;
+        try {
+            file = java.io.File.createTempFile(fileName,".fit");
+        } catch (IOException e) {
+            promise.reject("io_exception", "Failed to create a temp file! Please check if you have enough internal storage left.");
+            return;
+        }
 
+        encode = new FileEncoder(file, Fit.ProtocolVersion.V2_0);
+
+        // TODO: use the right Manufacturer id, product id, serial number
+        //Generate FileIdMessage
+        FileIdMesg fileIdMesg = new FileIdMesg(); // Every FIT file MUST contain a 'File ID' message as the first message
+        fileIdMesg.setManufacturer(Manufacturer.DYNASTREAM);
+        fileIdMesg.setType(File.ACTIVITY);
+        fileIdMesg.setProduct(9001);
+        fileIdMesg.setSerialNumber(1701L);
+
+        encode.write(fileIdMesg); // Encode the FileIDMesg
+
+        // TODO: use the correct app id
+        byte[] appId = new byte[]{
+                0x1, 0x1, 0x2, 0x3,
+                0x5, 0x8, 0xD, 0x15,
+                0x22, 0x37, 0x59, (byte) 0x90,
+                (byte) 0xE9, 0x79, 0x62, (byte) 0xDB
+        };
+
+        DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
+        for (int i = 0; i < appId.length; i++) {
+            developerIdMesg.setApplicationId(i, appId[i]);
+        }
+        developerIdMesg.setDeveloperDataIndex((short)0);
+        encode.write(developerIdMesg);
+
+
+
+        FieldDescriptionMesg hrFieldDescMesg = new FieldDescriptionMesg();
+        hrFieldDescMesg.setDeveloperDataIndex((short)0);
+        hrFieldDescMesg.setFieldDefinitionNumber((short)1);
+        hrFieldDescMesg.setFitBaseTypeId((short)Fit.BASE_TYPE_UINT8);
+        hrFieldDescMesg.setFieldName(0, "hr");
+        hrFieldDescMesg.setUnits(0, "bpm");
+        hrFieldDescMesg.setNativeFieldNum((short) RecordMesg.HeartRateFieldNum);
+        encode.write(hrFieldDescMesg);
+
+        RecordMesg record = new RecordMesg();
+        DeveloperField hrDevField = new DeveloperField(hrFieldDescMesg, developerIdMesg);
+        record.addDeveloperField(hrDevField);
+
+        /*
+      distance: randomIntString(20, 20000),
+      calories: randomFloatString(1, 200),
+      runningTime: randomIntString(30, 6000),
+      usetime: randomIntString(30, 6000),
+      steps: randomIntString(60, 4230),
+      pulse: randomIntString(70, 130),
+      speed: randomFloatString(4, 10),
+        * */
+        record.setActivityType(ActivityType.RUNNING);
+        record.setHeartRate((short)session.getInt("pulse"));
+        hrDevField.setValue((short)session.getInt("pulse"));
+        record.setCadence((short)session.getInt("cadence"));
+        record.setDistance((float)session.getDouble("distance"));
+        record.setSpeed((float)session.getDouble("speed"));
+        record.setCalories(session.getInt("calories"));
+        record.setTime128((float)session.getDouble("runningTime"));
+        // TODO: set steps
+        encode.write(record);
+
+        try {
+            encode.close();
+        } catch (FitRuntimeException e) {
+            System.err.println("Error closing encode.");
+            return;
+        }
+
+        promise.resolve(file.getAbsolutePath());
     }
 }
