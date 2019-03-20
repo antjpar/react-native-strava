@@ -131,7 +131,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         try {
             encode.close();
         } catch (FitRuntimeException e) {
-            System.err.println("Error closing encode.");
+            promise.reject("io_exception", "Failed to finalize encoding.");
             return;
         }
 
