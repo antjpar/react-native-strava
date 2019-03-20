@@ -56,4 +56,9 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         ReactContext context = getReactApplicationContext();
         context.startActivity(intent);
     }
+
+    @ReactMethod
+    public void generateFitFile() {
+
+    }
 }
