@@ -117,15 +117,6 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         DeveloperField hrDevField = new DeveloperField(hrFieldDescMesg, developerIdMesg);
         record.addDeveloperField(hrDevField);
 
-        /*
-      distance: randomIntString(20, 20000),
-      calories: randomFloatString(1, 200),
-      runningTime: randomIntString(30, 6000),
-      usetime: randomIntString(30, 6000),
-      steps: randomIntString(60, 4230),
-      pulse: randomIntString(70, 130),
-      speed: randomFloatString(4, 10),
-        * */
         record.setActivityType(ActivityType.RUNNING);
         record.setHeartRate((short)session.getInt("pulse"));
         hrDevField.setValue((short)session.getInt("pulse"));
