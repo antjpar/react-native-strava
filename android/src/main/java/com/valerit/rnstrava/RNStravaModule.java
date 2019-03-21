@@ -102,24 +102,25 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         developerIdMesg.setDeveloperDataIndex((short)0);
         encode.write(developerIdMesg);
 
-
-
-        FieldDescriptionMesg hrFieldDescMesg = new FieldDescriptionMesg();
-        hrFieldDescMesg.setDeveloperDataIndex((short)0);
-        hrFieldDescMesg.setFieldDefinitionNumber((short)1);
-        hrFieldDescMesg.setFitBaseTypeId((short)Fit.BASE_TYPE_UINT8);
-        hrFieldDescMesg.setFieldName(0, "hr");
-        hrFieldDescMesg.setUnits(0, "bpm");
-        hrFieldDescMesg.setNativeFieldNum((short) RecordMesg.HeartRateFieldNum);
-        encode.write(hrFieldDescMesg);
+        FieldDescriptionMesg fieldDescMesg = new FieldDescriptionMesg();
+        fieldDescMesg.setDeveloperDataIndex((short)0);
+        fieldDescMesg.setFieldDefinitionNumber((short)0);
+        fieldDescMesg.setFitBaseTypeId((short) Fit.BASE_TYPE_SINT8);
+        fieldDescMesg.setFieldName(0, "doughnuts_earned");
+        fieldDescMesg.setUnits(0, "doughnuts");
+        encode.write(fieldDescMesg);
 
         RecordMesg record = new RecordMesg();
-        DeveloperField hrDevField = new DeveloperField(hrFieldDescMesg, developerIdMesg);
-        record.addDeveloperField(hrDevField);
+        DeveloperField devField = new DeveloperField(fieldDescMesg, developerIdMesg);
+        record.addDeveloperField(devField);
+
+        // Developer field
+        DeveloperField doughnutsEarnedField = new DeveloperField(fieldDescMesg, developerIdMesg);
+        record.addDeveloperField(doughnutsEarnedField);
 
         record.setActivityType(ActivityType.RUNNING);
         record.setHeartRate((short)session.getInt("pulse"));
-        hrDevField.setValue((short)session.getInt("pulse"));
+        devField.setValue((short)session.getInt("pulse"));
         record.setDistance((float)session.getDouble("distance"));
         record.setSpeed((float)session.getDouble("speed"));
         record.setCalories(session.getInt("calories"));

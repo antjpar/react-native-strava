@@ -132,26 +132,19 @@ public:
     fieldDesc.SetFitBaseTypeId(FIT_BASE_TYPE_SINT8);
     fieldDesc.SetFieldName(0, L"doughnuts_earned");
     fieldDesc.SetUnits(0, L"doughnuts");
-    /*
-     record.setHeartRate((short)session.getInt("pulse"));
-     hrDevField.setValue((short)session.getInt("pulse"));
-     record.setDistance((float)session.getDouble("distance"));
-     record.setSpeed((float)session.getDouble("speed"));
-     record.setCalories(session.getInt("calories"));
-     record.setTime128((float)session.getDouble("runningTime"));
-     */
+
+    fit::RecordMesg newRecord;
+    fit::DeveloperField doughnutsEarnedField(fieldDesc, devId);
+    newRecord.SetHeartRate([session[@"pulse"] unsignedCharValue]);
+    newRecord.SetDistance([session[@"distance"] floatValue]);
+    newRecord.SetSpeed([session[@"speed"] floatValue]);
+    newRecord.SetCalories([session[@"calories"] unsignedShortValue]);
+    newRecord.SetTime128([session[@"runningTime"] floatValue]);
+    doughnutsEarnedField.AddValue(1);
   
+    newRecord.AddDeveloperField(doughnutsEarnedField);
   
-  fit::RecordMesg newRecord;
-  fit::DeveloperField doughnutsEarnedField(fieldDesc, devId);
-  newRecord.SetHeartRate([session[@"pulse"] unsignedCharValue]);
-  newRecord.SetDistance([session[@"distance"] floatValue]);
-  newRecord.SetSpeed([session[@"speed"] floatValue]);
-  doughnutsEarnedField.AddValue(1);
-  
-  newRecord.AddDeveloperField(doughnutsEarnedField);
-  
-  records.push_back(newRecord);
+    records.push_back(newRecord);
 
     [super.fe Open:file];
     [super.fe WriteMesg:fileId];
