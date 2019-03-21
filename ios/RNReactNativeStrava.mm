@@ -1,7 +1,8 @@
+#import <SafariServices/SafariServices.h>
+#import <Foundation/Foundation.h>
 
 #import "RNReactNativeStrava.h"
 //#import <AuthenticationServices/AuthenticationServices.h>
-#import <SafariServices/SafariServices.h>
 
 #import "ActivityExample.h"
 

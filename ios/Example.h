@@ -20,7 +20,7 @@
 
 @interface Example : NSObject
 
-- (FIT_UINT8)encode;
+- (FIT_UINT8)encode: (NSDictionary *) session;
 - (FIT_UINT8)decode;
 - (const char *)readOnlyParam;
 - (const char *)writeOnlyParam;

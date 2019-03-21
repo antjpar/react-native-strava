@@ -100,7 +100,7 @@ public:
     return self;
 }
 
-- (FIT_UINT8)encode
+- (FIT_UINT8)encode: (NSDictionary *) session
 {
     std::list<fit::RecordMesg> records;
     FILE *file;
