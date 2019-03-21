@@ -65,6 +65,20 @@ RCT_EXPORT_METHOD(generateFitFile:(NSDictionary*) session
   [ae encode:session];
   resolve(ae.filePath);
 }
+
+RCT_EXPORT_METHOD(uploadActivity:(NSDictionary*) session
+                  accessToken: (NSString*) access_token
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  
+  ActivityExample *ae = [[ActivityExample alloc] init];
+  [ae encode:session];
+  NSString* filePath = ae.filePath;
+  
+  NSURL* url = [NSURL fileURLWithPath:filePath];
+  resolve([url absoluteString]);
+}
+
 RCT_EXPORT_MODULE(RNReactNativeStrava);
 
 @end
