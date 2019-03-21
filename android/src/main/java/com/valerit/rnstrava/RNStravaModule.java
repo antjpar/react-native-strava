@@ -120,7 +120,6 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         record.setActivityType(ActivityType.RUNNING);
         record.setHeartRate((short)session.getInt("pulse"));
         hrDevField.setValue((short)session.getInt("pulse"));
-        record.setCadence((short)session.getInt("cadence"));
         record.setDistance((float)session.getDouble("distance"));
         record.setSpeed((float)session.getDouble("speed"));
         record.setCalories(session.getInt("calories"));
