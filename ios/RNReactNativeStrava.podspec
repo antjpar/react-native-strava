@@ -12,10 +12,9 @@ Pod::Spec.new do |s|
   s.author             = { "author" => "valeritsert@gmail.com" }
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/valerit/react-native-strava.git", :tag => "master" }
-  s.source_files  = "*.{h,m}"
+  s.source_files  = "*.{h,m,mm}", "lib/usr/local/include/*"
   s.requires_arc = true
-
-
+  s.vendored_libraries = "lib/libFitSdkCppiOS.a"
   s.dependency "React"
   #s.dependency "others"
 
