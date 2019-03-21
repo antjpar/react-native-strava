@@ -95,7 +95,8 @@ public:
     self = [super init];
     if(self)
     {
-        super.fileName = @"ActivityFile.fit";
+        NSString *uuid = [[NSUUID UUID] UUIDString];
+        super.fileName = [uuid stringByAppendingString:@".fit"];
     }
     return self;
 }
@@ -114,7 +115,7 @@ public:
 
     fit::FileIdMesg fileId; // Every FIT file requires a File ID message
     fileId.SetType(FIT_FILE_ACTIVITY);
-    fileId.SetManufacturer(FIT_MANUFACTURER_DYNASTREAM);
+    fileId.SetManufacturer(FIT_MANUFACTURER_DEVELOPMENT);
     fileId.SetProduct(1231);
     fileId.SetSerialNumber(12345);
 
@@ -131,21 +132,26 @@ public:
     fieldDesc.SetFitBaseTypeId(FIT_BASE_TYPE_SINT8);
     fieldDesc.SetFieldName(0, L"doughnuts_earned");
     fieldDesc.SetUnits(0, L"doughnuts");
-
-    for (FIT_UINT8 i = 0; i < 3; i++)
-    {
-        fit::RecordMesg newRecord;
-        fit::DeveloperField doughnutsEarnedField(fieldDesc, devId);
-        newRecord.SetHeartRate(140 + (i * 2));
-        newRecord.SetCadence(88 + (i * 2));
-        newRecord.SetDistance(510 + (i * 100.0f));
-        newRecord.SetSpeed(2.8f + (i * 0.4f));
-        doughnutsEarnedField.AddValue(i + 1);
-
-        newRecord.AddDeveloperField(doughnutsEarnedField);
-
-        records.push_back(newRecord);
-    }
+    /*
+     record.setHeartRate((short)session.getInt("pulse"));
+     hrDevField.setValue((short)session.getInt("pulse"));
+     record.setDistance((float)session.getDouble("distance"));
+     record.setSpeed((float)session.getDouble("speed"));
+     record.setCalories(session.getInt("calories"));
+     record.setTime128((float)session.getDouble("runningTime"));
+     */
+  
+  
+  fit::RecordMesg newRecord;
+  fit::DeveloperField doughnutsEarnedField(fieldDesc, devId);
+  newRecord.SetHeartRate([session[@"pulse"] unsignedCharValue]);
+  newRecord.SetDistance([session[@"distance"] floatValue]);
+  newRecord.SetSpeed([session[@"speed"] floatValue]);
+  doughnutsEarnedField.AddValue(1);
+  
+  newRecord.AddDeveloperField(doughnutsEarnedField);
+  
+  records.push_back(newRecord);
 
     [super.fe Open:file];
     [super.fe WriteMesg:fileId];
