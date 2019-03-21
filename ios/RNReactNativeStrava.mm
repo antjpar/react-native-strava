@@ -62,7 +62,7 @@ RCT_EXPORT_METHOD(generateFitFile:(NSDictionary*) session
                   rejecter:(RCTPromiseRejectBlock)reject) {
 
   ActivityExample *ae = [[ActivityExample alloc] init];
-  [ae encode];
+  [ae encode:session];
   resolve(ae.filePath);
 }
 RCT_EXPORT_MODULE(RNReactNativeStrava);
