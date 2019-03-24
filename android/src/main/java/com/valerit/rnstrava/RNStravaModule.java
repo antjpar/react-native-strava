@@ -28,7 +28,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void login(String client_id, String redirect_uri, String response_type, String approval_prompt, String scope) {
         response_type = response_type == null ? "code" : response_type;
-        approval_prompt = approval_prompt == null ? "auto" : response_type;
+        approval_prompt = approval_prompt == null ? "auto" : approval_prompt;
         scope = scope == null ? "activity:write,read" : scope;
 
         if (client_id == null) {
