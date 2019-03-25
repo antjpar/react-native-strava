@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.garmin.fit.*;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.UUID;
 
 public class RNStravaModule extends ReactContextBaseJavaModule {
@@ -102,6 +103,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         developerIdMesg.setDeveloperDataIndex((short)0);
         encode.write(developerIdMesg);
 
+        DateTime timestamp = new DateTime(new Date().getTime());
 
         SessionMesg sessionMsg = new SessionMesg();
         sessionMsg.setSport(Sport.RUNNING);
@@ -110,6 +112,15 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         sessionMsg.setTotalDistance((float)session.getDouble("distance"));
         sessionMsg.setTotalAscent(0);
         encode.write(sessionMsg);
+
+        LapMesg lapMsg = new LapMesg();
+
+        lapMsg.setTimestamp(timestamp);
+        lapMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
+        lapMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
+        lapMsg.setTotalDistance((float)session.getDouble("distance"));
+        sessionMsg.setTotalAscent(0);
+        encode.write(lapMsg);
 
         FieldDescriptionMesg fieldDescMesg = new FieldDescriptionMesg();
         fieldDescMesg.setDeveloperDataIndex((short)0);
