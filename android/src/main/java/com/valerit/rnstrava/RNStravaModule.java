@@ -145,9 +145,16 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         record.setSpeed((float)session.getDouble("speed"));
         record.setCalories(session.getInt("calories"));
         record.setTime128((float)session.getDouble("runningTime"));
+        record.setPositionLat(0);
+        record.setPositionLong(0);
+
         // TODO: set steps
         encode.write(record);
 
+        EventMesg eventMesg = new EventMesg();
+        eventMesg.setTimestamp(timestamp);
+        eventMesg.setEventType(EventType.STOP);
+        
         try {
             encode.close();
         } catch (FitRuntimeException e) {
