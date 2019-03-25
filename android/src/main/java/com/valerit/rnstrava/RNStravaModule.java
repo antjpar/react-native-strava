@@ -70,6 +70,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         String fileName = UUID.randomUUID().toString();
         java.io.File file;
         try {
+            // , reactContext.getExternalMediaDirs()[0]
             file = java.io.File.createTempFile(fileName,".fit");
         } catch (IOException e) {
             promise.reject("io_exception", "Failed to create a temp file! Please check if you have enough internal storage left.");
@@ -79,22 +80,30 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         encode = new FileEncoder(file, Fit.ProtocolVersion.V2_0);
 
         DateTime timestamp = new DateTime(new Date((long)session.getDouble("date")));
+
+        DateTime starTime = new DateTime(timestamp);
+        starTime.add(-session.getDouble("runningTime"));
         Log.d("react-native-strava", timestamp.getDate().toString());
 
         // TODO: use the right Manufacturer id, product id, serial number
         //Generate FileIdMessage
         FileIdMesg fileIdMesg = new FileIdMesg(); // Every FIT file MUST contain a 'File ID' message as the first message
-        fileIdMesg.setManufacturer(Manufacturer.DEVELOPMENT);
+        fileIdMesg.setManufacturer(Manufacturer.GARMIN);
         fileIdMesg.setType(File.ACTIVITY);
         fileIdMesg.setProduct(9001);
         fileIdMesg.setSerialNumber(1701L);
         fileIdMesg.setTimeCreated(timestamp);
 
-
         encode.write(fileIdMesg); // Encode the FileIDMesg
+
+        EventMesg eventMesg = new EventMesg();
+        eventMesg.setTimestamp(timestamp);
+        eventMesg.setEventType(EventType.STOP);
+        encode.write(eventMesg);
 
         SessionMesg sessionMsg = new SessionMesg();
         sessionMsg.setSport(Sport.RUNNING);
+        sessionMsg.setStartTime(starTime);
         sessionMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
         sessionMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
         sessionMsg.setTotalDistance((float)session.getDouble("distance"));
@@ -108,6 +117,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         lapMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
         lapMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
         lapMsg.setTotalDistance((float)session.getDouble("distance"));
+
         sessionMsg.setTotalAscent(0);
         encode.write(lapMsg);
 
@@ -127,12 +137,13 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         // TODO: set steps
         encode.write(record);
 
-        EventMesg eventMesg = new EventMesg();
-        eventMesg.setTimestamp(timestamp);
-        eventMesg.setEventType(EventType.STOP);
-        encode.write(eventMesg);
+        ActivityMesg aMsg = new ActivityMesg();
+        aMsg.setNumSessions(1);
+        aMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
+        aMsg.setTimestamp(timestamp);
 
-        Log.d("react-native-strava", String.valueOf(file.length()));
+        encode.write(aMsg);
+
         try {
             encode.close();
         } catch (FitRuntimeException e) {
@@ -142,6 +153,10 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
 
         promise.resolve(file.getAbsolutePath());
+    }
+
+    @ReactMethod
+    public void deleteFitFile(String path, Promise promise) {
     }
 
     int degreeToSemicircles(double d) {
