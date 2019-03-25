@@ -81,27 +81,14 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         // TODO: use the right Manufacturer id, product id, serial number
         //Generate FileIdMessage
         FileIdMesg fileIdMesg = new FileIdMesg(); // Every FIT file MUST contain a 'File ID' message as the first message
-        fileIdMesg.setManufacturer(Manufacturer.DYNASTREAM);
+        fileIdMesg.setManufacturer(Manufacturer.DEVELOPMENT);
         fileIdMesg.setType(File.ACTIVITY);
         fileIdMesg.setProduct(9001);
         fileIdMesg.setSerialNumber(1701L);
+        fileIdMesg.setTimeCreated(new DateTime(new Date().getTime()));
 
         encode.write(fileIdMesg); // Encode the FileIDMesg
 
-        // TODO: use the correct app id
-        byte[] appId = new byte[]{
-                0x1, 0x1, 0x2, 0x3,
-                0x5, 0x8, 0xD, 0x15,
-                0x22, 0x37, 0x59, (byte) 0x90,
-                (byte) 0xE9, 0x79, 0x62, (byte) 0xDB
-        };
-
-        DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
-        for (int i = 0; i < appId.length; i++) {
-            developerIdMesg.setApplicationId(i, appId[i]);
-        }
-        developerIdMesg.setDeveloperDataIndex((short)0);
-        encode.write(developerIdMesg);
 
         DateTime timestamp = new DateTime(new Date().getTime());
 
@@ -122,31 +109,19 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         sessionMsg.setTotalAscent(0);
         encode.write(lapMsg);
 
-        FieldDescriptionMesg fieldDescMesg = new FieldDescriptionMesg();
-        fieldDescMesg.setDeveloperDataIndex((short)0);
-        fieldDescMesg.setFieldDefinitionNumber((short)0);
-        fieldDescMesg.setFitBaseTypeId((short) Fit.BASE_TYPE_SINT8);
-        fieldDescMesg.setFieldName(0, "doughnuts_earned");
-        fieldDescMesg.setUnits(0, "doughnuts");
-        encode.write(fieldDescMesg);
-
         RecordMesg record = new RecordMesg();
-        DeveloperField devField = new DeveloperField(fieldDescMesg, developerIdMesg);
-        record.addDeveloperField(devField);
-
-        // Developer field
-        DeveloperField doughnutsEarnedField = new DeveloperField(fieldDescMesg, developerIdMesg);
-        record.addDeveloperField(doughnutsEarnedField);
 
         record.setActivityType(ActivityType.RUNNING);
+        record.setTimestamp(timestamp);
+        // TODO: extract lat, lng from session
+        record.setPositionLat(degreeToSemicircles(41.716667));
+        record.setPositionLong(degreeToSemicircles(44.783333));
+        record.setAltitude(100.0f);
         record.setHeartRate((short)session.getInt("pulse"));
-        devField.setValue((short)session.getInt("pulse"));
         record.setDistance((float)session.getDouble("distance"));
         record.setSpeed((float)session.getDouble("speed"));
         record.setCalories(session.getInt("calories"));
         record.setTime128((float)session.getDouble("runningTime"));
-        record.setPositionLat(0);
-        record.setPositionLong(0);
 
         // TODO: set steps
         encode.write(record);
@@ -154,7 +129,9 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         EventMesg eventMesg = new EventMesg();
         eventMesg.setTimestamp(timestamp);
         eventMesg.setEventType(EventType.STOP);
-        
+        encode.write(eventMesg);
+
+        Log.d("react-native-strava", String.valueOf(file.length()));
         try {
             encode.close();
         } catch (FitRuntimeException e) {
@@ -162,6 +139,11 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
             return;
         }
 
+
         promise.resolve(file.getAbsolutePath());
+    }
+
+    int degreeToSemicircles(double d) {
+        return (int)(d / 90.0 * 2147483647.0);
     }
 }
