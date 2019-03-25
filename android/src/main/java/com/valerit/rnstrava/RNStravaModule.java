@@ -61,8 +61,6 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         ReactContext context = getReactApplicationContext();
         context.startActivity(intent);
     }
-<<<<<<< HEAD
-=======
 
     @ReactMethod
     public void generateFitFile(ReadableMap session, Promise promise) {
@@ -139,5 +137,4 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         promise.resolve(file.getAbsolutePath());
     }
->>>>>>> 73306e1bf72238afb504d4685866a885238739b9
 }
