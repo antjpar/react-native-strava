@@ -78,6 +78,9 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         encode = new FileEncoder(file, Fit.ProtocolVersion.V2_0);
 
+        DateTime timestamp = new DateTime(new Date((long)session.getDouble("date")));
+        Log.d("react-native-strava", timestamp.getDate().toString());
+
         // TODO: use the right Manufacturer id, product id, serial number
         //Generate FileIdMessage
         FileIdMesg fileIdMesg = new FileIdMesg(); // Every FIT file MUST contain a 'File ID' message as the first message
@@ -85,12 +88,10 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         fileIdMesg.setType(File.ACTIVITY);
         fileIdMesg.setProduct(9001);
         fileIdMesg.setSerialNumber(1701L);
-        fileIdMesg.setTimeCreated(new DateTime(new Date().getTime()));
+        fileIdMesg.setTimeCreated(timestamp);
+
 
         encode.write(fileIdMesg); // Encode the FileIDMesg
-
-
-        DateTime timestamp = new DateTime(new Date().getTime());
 
         SessionMesg sessionMsg = new SessionMesg();
         sessionMsg.setSport(Sport.RUNNING);
@@ -98,6 +99,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         sessionMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
         sessionMsg.setTotalDistance((float)session.getDouble("distance"));
         sessionMsg.setTotalAscent(0);
+        sessionMsg.setTimestamp(timestamp);
         encode.write(sessionMsg);
 
         LapMesg lapMsg = new LapMesg();
@@ -121,7 +123,6 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         record.setDistance((float)session.getDouble("distance"));
         record.setSpeed((float)session.getDouble("speed"));
         record.setCalories(session.getInt("calories"));
-        record.setTime128((float)session.getDouble("runningTime"));
 
         // TODO: set steps
         encode.write(record);
