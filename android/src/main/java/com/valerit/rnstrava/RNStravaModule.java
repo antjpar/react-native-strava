@@ -102,6 +102,12 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         developerIdMesg.setDeveloperDataIndex((short)0);
         encode.write(developerIdMesg);
 
+
+        SessionMesg sessionMsg = new SessionMesg();
+        sessionMsg.setSport(Sport.RUNNING);
+        sessionMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
+        
+
         FieldDescriptionMesg fieldDescMesg = new FieldDescriptionMesg();
         fieldDescMesg.setDeveloperDataIndex((short)0);
         fieldDescMesg.setFieldDefinitionNumber((short)0);
