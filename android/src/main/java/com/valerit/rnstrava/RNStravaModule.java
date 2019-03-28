@@ -96,30 +96,11 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         encode.write(fileIdMesg); // Encode the FileIDMesg
 
-        EventMesg eventMesg = new EventMesg();
-        eventMesg.setTimestamp(timestamp);
-        eventMesg.setEventType(EventType.STOP);
-        encode.write(eventMesg);
+        EventMesg eventMesgStart = new EventMesg();
+        eventMesgStart.setTimestamp(starTime);
+        eventMesgStart.setEventType(EventType.START);
+        encode.write(eventMesgStart);
 
-        SessionMesg sessionMsg = new SessionMesg();
-        sessionMsg.setSport(Sport.RUNNING);
-        sessionMsg.setStartTime(starTime);
-        sessionMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
-        sessionMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
-        sessionMsg.setTotalDistance((float)session.getDouble("distance"));
-        sessionMsg.setTotalAscent(0);
-        sessionMsg.setTimestamp(timestamp);
-        encode.write(sessionMsg);
-
-        LapMesg lapMsg = new LapMesg();
-
-        lapMsg.setTimestamp(timestamp);
-        lapMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
-        lapMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
-        lapMsg.setTotalDistance((float)session.getDouble("distance"));
-
-        sessionMsg.setTotalAscent(0);
-        encode.write(lapMsg);
 
         RecordMesg record = new RecordMesg();
 
@@ -136,6 +117,32 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         // TODO: set steps
         encode.write(record);
+
+        EventMesg eventMesgEnd = new EventMesg();
+        eventMesgEnd.setTimestamp(timestamp);
+        eventMesgEnd.setEventType(EventType.STOP);
+        encode.write(eventMesgEnd);
+
+        LapMesg lapMsg = new LapMesg();
+        lapMsg.setTimestamp(timestamp);
+        lapMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
+        lapMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
+        lapMsg.setTotalDistance((float)session.getDouble("distance"));
+
+        EventMesg eventMesgDisableAll = new EventMesg();
+        eventMesgDisableAll.setTimestamp(timestamp);
+        eventMesgDisableAll.setEventType(EventType.STOP_DISABLE_ALL);
+        encode.write(eventMesgDisableAll);
+
+        SessionMesg sessionMsg = new SessionMesg();
+        sessionMsg.setSport(Sport.RUNNING);
+        sessionMsg.setStartTime(starTime);
+        sessionMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
+        sessionMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
+        sessionMsg.setTotalDistance((float)session.getDouble("distance"));
+        sessionMsg.setTotalAscent(0);
+        sessionMsg.setTimestamp(timestamp);
+        encode.write(sessionMsg);
 
         ActivityMesg aMsg = new ActivityMesg();
         aMsg.setNumSessions(1);
