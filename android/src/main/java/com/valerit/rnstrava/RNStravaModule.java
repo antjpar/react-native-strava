@@ -105,11 +105,21 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         RecordMesg record = new RecordMesg();
 
         record.setActivityType(ActivityType.RUNNING);
+        record.setTimestamp(starTime);
+
+        record.setHeartRate((short)0);
+        record.setDistance(0.f);
+        record.setSpeed(0.f);
+        record.setCalories(0);
+
+        // TODO: set steps
+        encode.write(record);
+
+        record.setActivityType(ActivityType.RUNNING);
         record.setTimestamp(timestamp);
         // TODO: extract lat, lng from session
-        record.setPositionLat(degreeToSemicircles(41.716667));
-        record.setPositionLong(degreeToSemicircles(44.783333));
-        record.setAltitude(100.0f);
+//        record.setPositionLat(degreeToSemicircles(41.726667));
+//        record.setPositionLong(degreeToSemicircles(44.883333));
         record.setHeartRate((short)session.getInt("pulse"));
         record.setDistance((float)session.getDouble("distance"));
         record.setSpeed((float)session.getDouble("speed"));
