@@ -71,7 +71,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         java.io.File file;
         try {
             // , reactContext.getExternalMediaDirs()[0]
-            file = java.io.File.createTempFile(fileName,".fit");
+            file = java.io.File.createTempFile(fileName, ".fit");
         } catch (IOException e) {
             promise.reject("io_exception", "Failed to create a temp file! Please check if you have enough internal storage left.");
             return;
@@ -79,7 +79,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         encode = new FileEncoder(file, Fit.ProtocolVersion.V2_0);
 
-        DateTime timestamp = new DateTime(new Date((long)session.getDouble("date")));
+        DateTime timestamp = new DateTime(new Date((long) session.getDouble("date")));
 
         DateTime starTime = new DateTime(timestamp);
         starTime.add(-session.getDouble("runningTime"));
@@ -107,7 +107,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         record.setActivityType(ActivityType.RUNNING);
         record.setTimestamp(starTime);
 
-        record.setHeartRate((short)0);
+        record.setHeartRate((short) 0);
         record.setDistance(0.f);
         record.setSpeed(0.f);
         record.setCalories(0);
@@ -120,9 +120,9 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         // TODO: extract lat, lng from session
 //        record.setPositionLat(degreeToSemicircles(41.726667));
 //        record.setPositionLong(degreeToSemicircles(44.883333));
-        record.setHeartRate((short)session.getInt("pulse"));
-        record.setDistance((float)session.getDouble("distance"));
-        record.setSpeed((float)session.getDouble("speed"));
+        record.setHeartRate((short) session.getInt("pulse"));
+        record.setDistance((float) session.getDouble("distance"));
+        record.setSpeed((float) session.getDouble("speed"));
         record.setCalories(session.getInt("calories"));
 
         // TODO: set steps
@@ -135,9 +135,9 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         LapMesg lapMsg = new LapMesg();
         lapMsg.setTimestamp(timestamp);
-        lapMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
-        lapMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
-        lapMsg.setTotalDistance((float)session.getDouble("distance"));
+        lapMsg.setTotalElapsedTime((float) session.getDouble("runningTime"));
+        lapMsg.setTotalTimerTime((float) session.getDouble("runningTime"));
+        lapMsg.setTotalDistance((float) session.getDouble("distance"));
 
         EventMesg eventMesgDisableAll = new EventMesg();
         eventMesgDisableAll.setTimestamp(timestamp);
@@ -147,16 +147,16 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         SessionMesg sessionMsg = new SessionMesg();
         sessionMsg.setSport(Sport.RUNNING);
         sessionMsg.setStartTime(starTime);
-        sessionMsg.setTotalElapsedTime((float)session.getDouble("runningTime"));
-        sessionMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
-        sessionMsg.setTotalDistance((float)session.getDouble("distance"));
+        sessionMsg.setTotalElapsedTime((float) session.getDouble("runningTime"));
+        sessionMsg.setTotalTimerTime((float) session.getDouble("runningTime"));
+        sessionMsg.setTotalDistance((float) session.getDouble("distance"));
         sessionMsg.setTotalAscent(0);
         sessionMsg.setTimestamp(timestamp);
         encode.write(sessionMsg);
 
         ActivityMesg aMsg = new ActivityMesg();
         aMsg.setNumSessions(1);
-        aMsg.setTotalTimerTime((float)session.getDouble("runningTime"));
+        aMsg.setTotalTimerTime((float) session.getDouble("runningTime"));
         aMsg.setTimestamp(timestamp);
 
         encode.write(aMsg);
@@ -177,6 +177,6 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
     }
 
     int degreeToSemicircles(double d) {
-        return (int)(d / 90.0 * 2147483647.0);
+        return (int) (d / 90.0 * 2147483647.0);
     }
 }
