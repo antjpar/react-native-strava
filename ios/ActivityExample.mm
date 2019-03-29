@@ -18,6 +18,12 @@
 #include "fit_file_id_mesg_listener.hpp"
 #include "fit_record_mesg_listener.hpp"
 #include "fit_mesg_broadcaster.hpp"
+#include "fit_date_time.hpp"
+#include "fit_event_mesg.hpp"
+#include "fit_record_mesg.hpp"
+#include "fit_lap_mesg.hpp"
+#include "fit_session_mesg.hpp"
+#include "fit_activity_mesg.hpp"
 
 class ActivityListener : fit::FileIdMesgListener, fit::MesgListener
 {
@@ -112,49 +118,73 @@ public:
         NSLog(@"Error opening file %@", super.fileName);
         return -1;
     }
-
+    [super.fe Open:file];
+  
+    fit::DateTime timestamp([session[@"date"] longValue]);
+    fit::DateTime startTime(timestamp);
+    startTime.add(-[session[@"usetime"] doubleValue]);
+  
     fit::FileIdMesg fileId; // Every FIT file requires a File ID message
     fileId.SetType(FIT_FILE_ACTIVITY);
     fileId.SetManufacturer(FIT_MANUFACTURER_DEVELOPMENT);
-    fileId.SetProduct(1231);
-    fileId.SetSerialNumber(12345);
-
-    fit::DeveloperDataIdMesg devId;
-    for (FIT_UINT8 i = 0; i < 16; i++)
-    {
-        devId.SetApplicationId(i, i);
-    }
-    devId.SetDeveloperDataIndex(0);
-
-    fit::FieldDescriptionMesg fieldDesc;
-    fieldDesc.SetDeveloperDataIndex(0);
-    fieldDesc.SetFieldDefinitionNumber(0);
-    fieldDesc.SetFitBaseTypeId(FIT_BASE_TYPE_SINT8);
-    fieldDesc.SetFieldName(0, L"doughnuts_earned");
-    fieldDesc.SetUnits(0, L"doughnuts");
+    fileId.SetProduct(9001);
+    fileId.SetSerialNumber(1701L);
+    [super.fe WriteMesg:fileId];
+  
+    fit::EventMesg eventMesgStart;
+    eventMesgStart.SetTimestamp(startTime.GetTimeStamp());
+    eventMesgStart.SetEventType(FIT_EVENT_TYPE_START);
+    [super.fe WriteMesg:eventMesgStart];
+  
+    fit::RecordMesg startRecord;
+    startRecord.SetActivityType(FIT_ACTIVITY_TYPE_RUNNING);
+    startRecord.SetTimestamp(startTime.GetTimeStamp());
+    startRecord.SetHeartRate(0);
+    startRecord.SetDistance(0.f);
+    startRecord.SetSpeed(0.f);
+    startRecord.SetCalories(0.f);
+    [super.fe WriteMesg:startRecord];
 
     fit::RecordMesg newRecord;
-    fit::DeveloperField doughnutsEarnedField(fieldDesc, devId);
     newRecord.SetHeartRate([session[@"pulse"] unsignedCharValue]);
     newRecord.SetDistance([session[@"distance"] floatValue]);
     newRecord.SetSpeed([session[@"speed"] floatValue]);
     newRecord.SetCalories([session[@"calories"] unsignedShortValue]);
-    newRecord.SetTime128([session[@"runningTime"] floatValue]);
-    doughnutsEarnedField.AddValue(1);
-  
-    newRecord.AddDeveloperField(doughnutsEarnedField);
-  
-    records.push_back(newRecord);
+    newRecord.SetTime128([session[@"usetime"] floatValue]);
+    [super.fe WriteMesg:newRecord];
 
-    [super.fe Open:file];
-    [super.fe WriteMesg:fileId];
-    [super.fe WriteMesg:devId];
-    [super.fe WriteMesg:fieldDesc];
+    fit::EventMesg eventMesgStop;
+    eventMesgStop.SetTimestamp(timestamp.GetTimeStamp());
+    eventMesgStop.SetEventType(FIT_EVENT_TYPE_STOP);
+    [super.fe WriteMesg:eventMesgStop];
 
-    for (auto record : records)
-    {
-        [super.fe WriteMesg:record];
-    }
+    fit::LapMesg lapMsg;
+    lapMsg.SetTimestamp(timestamp.GetTimeStamp());
+    lapMsg.SetTotalElapsedTime([session[@"usetime"] floatValue]);
+    lapMsg.SetTotalTimerTime([session[@"usetime"] floatValue]);
+    lapMsg.SetTotalDistance([session[@"distance"] floatValue]);
+    [super.fe WriteMesg:lapMsg];
+
+    fit::EventMesg eventMesgStopAll;
+    eventMesgStopAll.SetTimestamp(timestamp.GetTimeStamp());
+    eventMesgStopAll.SetEventType(FIT_EVENT_TYPE_STOP_DISABLE_ALL);
+    [super.fe WriteMesg:eventMesgStopAll];
+
+    fit::SessionMesg sessionMsg;
+    sessionMsg.SetSport(FIT_SPORT_RUNNING);
+    sessionMsg.SetStartTime(startTime.GetTimeStamp());
+    sessionMsg.SetTotalElapsedTime([session[@"usetime"] floatValue]);
+    sessionMsg.SetTotalTimerTime([session[@"usetime"] floatValue]);
+    sessionMsg.SetTotalDistance([session[@"distance"] floatValue]);
+    sessionMsg.SetTotalAscent(0);
+    sessionMsg.SetTimestamp(timestamp.GetTimeStamp());
+    [super.fe WriteMesg:sessionMsg];
+
+    fit::ActivityMesg aMsg;
+    aMsg.SetNumSessions(1);
+    aMsg.SetTotalTimerTime([session[@"usetime"] floatValue]);
+    aMsg.SetTimestamp(timestamp.GetTimeStamp());
+    [super.fe WriteMesg:aMsg];
 
     if (![super.fe Close])
     {

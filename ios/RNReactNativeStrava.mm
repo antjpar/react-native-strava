@@ -66,17 +66,18 @@ RCT_EXPORT_METHOD(generateFitFile:(NSDictionary*) session
   resolve(ae.filePath);
 }
 
-RCT_EXPORT_METHOD(uploadActivity:(NSDictionary*) session
-                  accessToken: (NSString*) access_token
+// deleteFitFile
+
+RCT_EXPORT_METHOD(deleteFitFile: (NSString *) path
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
   
-  ActivityExample *ae = [[ActivityExample alloc] init];
-  [ae encode:session];
-  NSString* filePath = ae.filePath;
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  NSError *error;
+  BOOL success = [fileManager removeItemAtPath:path error:&error];
   
-  NSURL* url = [NSURL fileURLWithPath:filePath];
-  resolve([url absoluteString]);
+  NSNumber *result = [[NSNumber alloc] initWithBool:success];
+  resolve(result);
 }
 
 RCT_EXPORT_MODULE(RNReactNativeStrava);
