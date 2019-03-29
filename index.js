@@ -11,6 +11,10 @@ class RNStrava {
   static generateFitFile(session) {
     return RNReactNativeStrava.generateFitFile(session);
   }
+
+  static deleteFitFile(path) {
+    return RNReactNativeStrava.deleteFitFile(path);
+  }
 }
 
 export default RNStrava;
