@@ -120,22 +120,23 @@ public:
     }
     [super.fe Open:file];
   
-    fit::DateTime timestamp([session[@"date"] longValue]);
-    fit::DateTime startTime(timestamp);
-    startTime.add(-[session[@"usetime"] doubleValue]);
+    fit::DateTime timestamp([session[@"date"] longValue] - 631065600L);
+    fit::DateTime startTime([session[@"date"] longValue] - 631065600L - [session[@"usetime"] longValue]);
   
     fit::FileIdMesg fileId; // Every FIT file requires a File ID message
     fileId.SetType(FIT_FILE_ACTIVITY);
-    fileId.SetManufacturer(FIT_MANUFACTURER_DEVELOPMENT);
+    fileId.SetManufacturer(FIT_MANUFACTURER_GARMIN);
     fileId.SetProduct(9001);
     fileId.SetSerialNumber(1701L);
+    fileId.SetTimeCreated(timestamp.GetTimeStamp());
+  
     [super.fe WriteMesg:fileId];
   
     fit::EventMesg eventMesgStart;
     eventMesgStart.SetTimestamp(startTime.GetTimeStamp());
     eventMesgStart.SetEventType(FIT_EVENT_TYPE_START);
     [super.fe WriteMesg:eventMesgStart];
-  
+
     fit::RecordMesg startRecord;
     startRecord.SetActivityType(FIT_ACTIVITY_TYPE_RUNNING);
     startRecord.SetTimestamp(startTime.GetTimeStamp());
@@ -143,9 +144,12 @@ public:
     startRecord.SetDistance(0.f);
     startRecord.SetSpeed(0.f);
     startRecord.SetCalories(0.f);
+    startRecord.SetTime128([session[@"usetime"] floatValue]);
     [super.fe WriteMesg:startRecord];
 
     fit::RecordMesg newRecord;
+    newRecord.SetActivityType(FIT_ACTIVITY_TYPE_RUNNING);
+    newRecord.SetTimestamp(startTime.GetTimeStamp());
     newRecord.SetHeartRate([session[@"pulse"] unsignedCharValue]);
     newRecord.SetDistance([session[@"distance"] floatValue]);
     newRecord.SetSpeed([session[@"speed"] floatValue]);
