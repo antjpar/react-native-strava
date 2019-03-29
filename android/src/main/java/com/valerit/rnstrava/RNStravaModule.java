@@ -82,7 +82,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         DateTime timestamp = new DateTime(new Date((long) session.getDouble("date")));
 
         DateTime starTime = new DateTime(timestamp);
-        starTime.add(-session.getDouble("runningTime"));
+        starTime.add(-session.getDouble("usetime"));
         Log.d("react-native-strava", timestamp.getDate().toString());
 
         // TODO: use the right Manufacturer id, product id, serial number
@@ -135,8 +135,8 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         LapMesg lapMsg = new LapMesg();
         lapMsg.setTimestamp(timestamp);
-        lapMsg.setTotalElapsedTime((float) session.getDouble("runningTime"));
-        lapMsg.setTotalTimerTime((float) session.getDouble("runningTime"));
+        lapMsg.setTotalElapsedTime((float) session.getDouble("usetime"));
+        lapMsg.setTotalTimerTime((float) session.getDouble("usetime"));
         lapMsg.setTotalDistance((float) session.getDouble("distance"));
 
         EventMesg eventMesgDisableAll = new EventMesg();
@@ -147,8 +147,8 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         SessionMesg sessionMsg = new SessionMesg();
         sessionMsg.setSport(Sport.RUNNING);
         sessionMsg.setStartTime(starTime);
-        sessionMsg.setTotalElapsedTime((float) session.getDouble("runningTime"));
-        sessionMsg.setTotalTimerTime((float) session.getDouble("runningTime"));
+        sessionMsg.setTotalElapsedTime((float) session.getDouble("usetime"));
+        sessionMsg.setTotalTimerTime((float) session.getDouble("usetime"));
         sessionMsg.setTotalDistance((float) session.getDouble("distance"));
         sessionMsg.setTotalAscent(0);
         sessionMsg.setTimestamp(timestamp);
@@ -156,7 +156,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         ActivityMesg aMsg = new ActivityMesg();
         aMsg.setNumSessions(1);
-        aMsg.setTotalTimerTime((float) session.getDouble("runningTime"));
+        aMsg.setTotalTimerTime((float) session.getDouble("usetime"));
         aMsg.setTimestamp(timestamp);
 
         encode.write(aMsg);
@@ -174,6 +174,9 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void deleteFitFile(String path, Promise promise) {
+        java.io.File file = new java.io.File(path);;
+        boolean result = file.delete();
+        promise.resolve(result);
     }
 
     int degreeToSemicircles(double d) {
