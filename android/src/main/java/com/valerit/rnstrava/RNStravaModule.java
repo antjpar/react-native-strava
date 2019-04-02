@@ -125,7 +125,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
                 DateTime tempTimestamp = new DateTime(startTime);
 
                 // next start time
-                tempTimestamp.add(r.getDouble("usetime");
+                tempTimestamp.add(r.getDouble("usetime"));
 
                 record.setTimestamp(tempTimestamp);
                 record.setHeartRate((short) r.getInt("pulse"));
