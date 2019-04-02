@@ -60,6 +60,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
                 .build();
 
         Intent intent = new Intent(Intent.ACTION_VIEW, intentUri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         ReactContext context = getReactApplicationContext();
         context.startActivity(intent);
     }
@@ -82,7 +83,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         encode = new FileEncoder(file, Fit.ProtocolVersion.V2_0);
 
-        DateTime timestamp = new DateTime(new Date((long) (session.getDouble("date") * 1000)));
+        DateTime timestamp = new DateTime(new Date((long) (session.getDouble("date"))));
 
         DateTime startTime = new DateTime(timestamp);
         startTime.add(-session.getDouble("usetime"));
@@ -119,13 +120,16 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         encode.write(record);
 
         if (records != null) {
-            Log.d("rn-strava", records.toString());
+            Log.d("rn-strava-record:", records.toString());
+            Log.d("rn-strava-record-size:", String.valueOf(records.size()));
+
             for (int i = 0; i < records.size(); i++) {
                 ReadableMap r = records.getMap(i);
                 DateTime tempTimestamp = new DateTime(startTime);
 
                 // next start time
                 tempTimestamp.add(r.getDouble("usetime"));
+                Log.d("rn-strava-record:", tempTimestamp.toString());
 
                 record.setTimestamp(tempTimestamp);
                 record.setHeartRate((short) r.getInt("pulse"));
