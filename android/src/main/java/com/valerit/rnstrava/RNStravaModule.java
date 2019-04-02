@@ -12,6 +12,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.garmin.fit.*;
 
@@ -77,12 +78,14 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
             return;
         }
 
+        ReadableArray records = session.getArray("records");
+
         encode = new FileEncoder(file, Fit.ProtocolVersion.V2_0);
 
-        DateTime timestamp = new DateTime(new Date((long) session.getDouble("date")));
+        DateTime timestamp = new DateTime(new Date((long) (session.getDouble("date") * 1000)));
 
-        DateTime starTime = new DateTime(timestamp);
-        starTime.add(-session.getDouble("usetime"));
+        DateTime startTime = new DateTime(timestamp);
+        startTime.add(-session.getDouble("usetime"));
         Log.d("react-native-strava", timestamp.getDate().toString());
 
         // TODO: use the right Manufacturer id, product id, serial number
@@ -97,7 +100,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         encode.write(fileIdMesg); // Encode the FileIDMesg
 
         EventMesg eventMesgStart = new EventMesg();
-        eventMesgStart.setTimestamp(starTime);
+        eventMesgStart.setTimestamp(startTime);
         eventMesgStart.setEventType(EventType.START);
         encode.write(eventMesgStart);
 
@@ -105,8 +108,8 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
         RecordMesg record = new RecordMesg();
 
         record.setActivityType(ActivityType.RUNNING);
-        record.setTimestamp(starTime);
 
+        record.setTimestamp(startTime);
         record.setHeartRate((short) 0);
         record.setDistance(0.f);
         record.setSpeed(0.f);
@@ -114,6 +117,25 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         // TODO: set steps
         encode.write(record);
+
+        if (records != null) {
+            Log.d("rn-strava", records.toString());
+            for (int i = 0; i < records.size(); i++) {
+                ReadableMap r = records.getMap(i);
+                DateTime tempTimestamp = new DateTime(startTime);
+
+                // next start time
+                tempTimestamp.add(r.getDouble("usetime");
+
+                record.setTimestamp(tempTimestamp);
+                record.setHeartRate((short) r.getInt("pulse"));
+                record.setDistance((float) r.getDouble("distance"));
+                record.setSpeed((float) r.getDouble("speed"));
+                record.setCalories(r.getInt("calories"));
+
+                encode.write(record);
+            }
+        }
 
         record.setActivityType(ActivityType.RUNNING);
         record.setTimestamp(timestamp);
@@ -146,7 +168,7 @@ public class RNStravaModule extends ReactContextBaseJavaModule {
 
         SessionMesg sessionMsg = new SessionMesg();
         sessionMsg.setSport(Sport.RUNNING);
-        sessionMsg.setStartTime(starTime);
+        sessionMsg.setStartTime(startTime);
         sessionMsg.setTotalElapsedTime((float) session.getDouble("usetime"));
         sessionMsg.setTotalTimerTime((float) session.getDouble("usetime"));
         sessionMsg.setTotalDistance((float) session.getDouble("distance"));
