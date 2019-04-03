@@ -109,8 +109,9 @@ public:
 
 - (FIT_UINT8)encode: (NSDictionary *) session
 {
-    std::list<fit::RecordMesg> records;
-    FILE *file;
+  NSArray* records = [session objectForKey:@"records"];
+
+  FILE *file;
     super.fe = [[FitEncode alloc] initWithVersion:fit::ProtocolVersion::V10];
 
     if( ( file = [self openFileWithParams:[super writeOnlyParam]] ) == NULL)
@@ -146,6 +147,25 @@ public:
     startRecord.SetCalories(0.f);
     startRecord.SetTime128([session[@"usetime"] floatValue]);
     [super.fe WriteMesg:startRecord];
+  
+    if (records != NULL) {
+      for (int i = 0; i < [records count]; i ++) {
+        NSDictionary* record = records[i];
+        fit::DateTime timestamp = fit::DateTime(startTime);
+        timestamp.add([record[@"usetime"] doubleValue]);
+        
+        fit::RecordMesg recordMsg;
+        recordMsg.SetActivityType(FIT_ACTIVITY_TYPE_RUNNING);
+        recordMsg.SetTimestamp(timestamp.GetTimeStamp());
+        recordMsg.SetHeartRate([record[@"pulse"] unsignedCharValue]);
+        recordMsg.SetDistance([record[@"distance"] floatValue]);
+        recordMsg.SetSpeed([record[@"speed"] floatValue]);
+        recordMsg.SetCalories([record[@"calories"] unsignedShortValue]);
+        recordMsg.SetTime128([record[@"usetime"] floatValue]);
+        [super.fe WriteMesg:recordMsg];
+      }
+    }
+  
 
     fit::RecordMesg newRecord;
     newRecord.SetActivityType(FIT_ACTIVITY_TYPE_RUNNING);
