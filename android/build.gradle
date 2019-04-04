@@ -31,6 +31,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.facebook.react:react-native:+'
-    implementation files('libs/fit.jar')
+    compile 'com.facebook.react:react-native:+'
+    compile files('libs/fit.jar')
 }
